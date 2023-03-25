@@ -1,69 +1,84 @@
 import React, {useState} from "react";
-import {postOperation} from "../api/operations";
+import {deleteOperation, postOperation} from "../api/operations";
+import {deleteTask} from "../api/tasks";
 
-const Operation = ({description, id, onRemoveOperation, timeSpent, status}) => {
-    const [timeLocal, setTimeLocal] = useState(null)
+const Operation = ({operation, onRemoveOperation, status, setOperations}) => {
+    const [timeLocal, setTimeLocal] = useState(null);
+    const [changeTime, setChangeTime] = useState(operation.timeSpent)
     const [showFormTime, setShowFormTime] = useState(false);
-    // const {
-    //     description,
-    //     timeSpent,
-    //     addedDate,
-    //     id,
-    //     task
-    // } = data;
-    const submitHandlerTime = (e) => {
+
+    const handleSetTimeLocal = (e) => {
         e.preventDefault();
-        const data = {}
-        postOperation(id, data, setOperations);
-        setShowForm(false);
+        setTimeLocal(parseInt(e.target.value))
     }
+
+    const viewFormToSet = (e) => {
+        e.preventDefault();
+        setShowFormTime(true);
+    }
+
+    const cancelFormNoSet = (e) => {
+        e.preventDefault();
+        setShowFormTime(false);
+    }
+    const saveTime = (e) => {
+        e.preventDefault();
+        setChangeTime(prevState => prevState + timeLocal);
+        const data = {description: operation.description, timeSpent: changeTime}
+
+        editOperation(operation.id, data, setOperations);
+        setTimeLocal(0);
+    }
+
+    const deleteOperationAPI = (e) => {
+        e.preventDefault();
+        deleteOperation(operation, onRemoveOperation)
+    }
+
+
 
 
     return (
         <li className="list-group-item d-flex justify-content-between align-items-center">
             <div>
-                {description}
+                {operation.description}
 
-                {/*/!*<!-- Czas wyświetlany tylko jeżeli większy od 0    -->*/}
-                {timeSpent > 0 ?
-                <span className="badge badge-success badge-pill ml-2">{timeSpent}</span>
-                    : null }
+                {operation.timeSpent > 0 ?
+                <span className="badge badge-success badge-pill ml-2">{operation.timeSpent}</span>
+                    : null
+                }
             </div>
 
-
-            {/*<!-- Formularz wyświetlany po naciśnięciu "Add time", po zapisie czasu znika -->*/}
-            {showFormTime &&
-                <form onSubmit={submitHandlerTime}>
-                    <div class="input-group input-group-sm">
+            {showFormTime ?
+                <form>
+                    <div className="input-group input-group-sm">
                         <input type="number"
-                               class="form-control"
+                               className="form-control"
                                placeholder="Spent time in minutes"
                                style="width: 12rem"
-                               value={timeLocal} onChange={e => setTimeLocal(parseInt(e.target.value))} />
-                        <div class="input-group-append">
-                            <button class="btn btn-outline-success" type="submit"><i class="fas fa-save"></i></button>
-                            <button class="btn btn-outline-dark" type="submit"><i class="fas fa-times false"></i></button>
+                               onChange={handleSetTimeLocal}/>
+                        <div className="input-group-append">
+                            <button className="btn btn-outline-success" type="submit" onClick={saveTime}><i className="fas fa-save"></i>
+                            </button>
+                            <button className="btn btn-outline-dark" type="submit" onClick={cancelFormNoSet}><i
+                                className="fas fa-times false"></i></button>
                         </div>
                     </div>
                 </form>
+                :
+                    <div>
+                        {status === "open" ?
+                            <button className="btn btn-outline-success btn-sm mr-2" onClick={viewFormToSet}>
+                                Add time
+                                <i className="fas fa-clock ml-1"></i>
+                            </button>
+                            : null
+                        }
+                        <button className="btn btn-outline-danger btn-sm" onClick={deleteOperationAPI}><i className="fas fa-trash"></i></button>
+                    </div>
+
             }
 
-
-
-            {/*// <!-- div wyświetlany domyślnie, znika po wciśnięciu "Add time" -->*/}
-            {!showFormTime &&
-                <div>
-                    {/*// <!-- Przycisk widoczny tylko jeżeli status zadania jest "open" -->*/}
-                    {status === "open" ?
-                        <button className="btn btn-outline-success btn-sm mr-2" onClick={() => setShowFormTime(true)}>
-                            Add time
-                            <i className="fas fa-clock ml-1"></i>
-                        </button>
-                        : <h5>status NIE Open</h5> }
-
-                    <button className="btn btn-outline-danger btn-sm" onClick={(e) => onRemoveOperation(e)}><i className="fas fa-trash"></i></button>
-                </div>
-            }
         </li>
     );
 };

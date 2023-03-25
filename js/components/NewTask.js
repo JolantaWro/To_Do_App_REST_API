@@ -8,8 +8,8 @@ const NewTask = ({onNewTask}) => {
     const submitHandler = (e) => {
         e.preventDefault();
         const data = {
-            title,
-            description,
+            title: title,
+            description: description,
             status: "open"
         }
         postTask(data, onNewTask);

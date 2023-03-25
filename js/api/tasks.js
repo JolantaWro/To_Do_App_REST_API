@@ -41,15 +41,15 @@ export const postTask = async (task, successCallback) => {
             throw new Error("Błąd!");
         }
 
-        successCallback(prev => [...prev, data.data]);
+        successCallback(data.data);
     } catch (err) {
         console.log(err);
     }
 };
 
-export const editTask = async (task, successCallback) => {
+export const editTask = async (id, task) => {
     try {
-        const response = await fetch(`${API_URL}/tasks/${task.id}`, {
+        const response = await fetch(`${API_URL}/tasks/${id}`, {
             headers: {
                 "Content-Type": "application/json",
                 Authorization: API_KEY,
@@ -60,10 +60,10 @@ export const editTask = async (task, successCallback) => {
 
         const data = await response.json();
 
-        if (data.error || typeof successCallback !== "function") {
+        if (data.error) {
             throw new Error("Błąd!");
         }
-        successCallback(task.status)
+
     } catch (err) {
         console.log(err);
     }
@@ -84,11 +84,10 @@ export const deleteTask = async (task, successCallback) => {
         if (data.error || typeof successCallback !== "function") {
             throw new Error("Błąd!");
         }
-        successCallback();
+        successCallback(task);
 
     } catch (err) {
         console.log(err);
 
     }
 };
-

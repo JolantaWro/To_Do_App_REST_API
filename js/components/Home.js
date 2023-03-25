@@ -10,28 +10,23 @@ const Home = () => {
         setTasks((prevState) => [...prevState, newTask])
     }
 
-    const onRemoveTask = (idTaskToDelete) => {
-        setTasks((prevState) => {
-            return prevState.id !== idTaskToDelete;
-        })
-
+    const onRemoveTask = (taskToRemove) => {
+        setTasks(prevState => prevState.filter(task => task.id !== taskToRemove.id));
     }
-
 
 
     useEffect(() => {
         getTasks(setTasks);
     }, []);
-    console.log(tasks)
+
 
     return (
         <>
-            <NewTask onNewTask={setTasks} />
+            <NewTask onNewTask={onNewTask} />
 
             {
                 tasks.map(task => {
-                    return <Task title={task.title} description={task.description} id={task.id} key={task.id}
-                                 status={task.status} onRemoveTask={setTasks} />
+                    return <Task task={task} onRemoveTask={onRemoveTask} key={task.id} />
                 })
             }
         </>

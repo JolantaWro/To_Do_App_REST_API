@@ -1,24 +1,26 @@
 import React, {useState} from 'react';
 import Operation from "./Operation";
-import {postOperation} from "../api/operations";
+import {deleteOperation, postOperation} from "../api/operations";
 
 const Operations = ({taskID, form, setForm, operationsAll, setOperations, status}) => {
-    const [operationLocal, setOperationLocal] = useState("")
+    const [operationDescription, setOperationDescription] = useState("");
 
-    const onRemoveOperation = (idOperationToDelete) => {
-        setOperations((prevState) => {
-            return prevState.id !== idOperationToDelete;
-        })
-
+    // const onRemoveOperation = (idOperation) => {
+    //     deleteOperation(idOperation, setOperations)
+    // }
+    const onRemoveOperation = (operationToRemove) => {
+        setOperations(prevState => prevState.filter(operation => operation.id !== operationToRemove.id))
     }
+
 
     const submitHandler = (e) => {
         e.preventDefault();
-        setOperations(prev => [...prev, operationLocal])
-        setOperationLocal("")
+        const data = {description: operationDescription, timeSpent: 0}
+        postOperation(taskID, data, setOperations);
+        setOperationDescription("")
         setForm(false);
     }
-    //taskID={id} form={showForm} setForm={setShowForm} operations={operations} setOperations={setOperations} status={status} />
+
 
 
     return (
@@ -31,8 +33,8 @@ const Operations = ({taskID, form, setForm, operationsAll, setOperations, status
                             <input type="text"
                                    className="form-control"
                                    placeholder="Operation description"
-                                   value={operationLocal}
-                                   onChange={e => setOperationLocal(e.target.value)} />
+                                   value={operationDescription}
+                                   onChange={e => setOperationDescription(e.target.value)} />
 
                             <div className="input-group-append">
                                 <button className="btn btn-info">
@@ -47,10 +49,9 @@ const Operations = ({taskID, form, setForm, operationsAll, setOperations, status
 
             <ul className="list-group list-group-flush">
                 {
-                    operationsAll.map(operation => <Operation key={operation.id} description={operation.description}
-                                                           id={operation.id}
-                                                           onRemoveOperation={onRemoveOperation}
-                                                           timeSpent={operation.timeSpent} status={operation.status}/>)
+                    operationsAll.map(operation => <Operation key={operation.id} operation={operation} status={status}
+                                                              onRemoveOperation={onRemoveOperation}
+                                                              setOperations={setOperations}/>)
                 }
             </ul>
         </div>
