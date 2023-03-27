@@ -3,7 +3,7 @@ import { createRoot } from "react-dom/client";
 import Home from "./components/Home";
 
 function App() {
-  return <Home />;
+  return < Home />;
 }
 
 const container = document.getElementById("app");

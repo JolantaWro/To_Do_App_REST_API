@@ -96,7 +96,7 @@ export const deleteOperation = async (operation, successCallback) => {
     }
 };
 
-export const editOperation = async (id, operation, successCallback) => {
+export const editOperation = async (id, operation) => {
     try {
         const response = await fetch(`${API_URL}/operations/${id}`, {
             headers: {
@@ -109,10 +109,9 @@ export const editOperation = async (id, operation, successCallback) => {
 
         const data = await response.json();
 
-        if (data.error || typeof successCallback !== "function") {
+        if (data.error) {
             throw new Error("Błąd!");
         }
-        successCallback(prevState => [...prevState, data.data]);
 
     } catch (err) {
         console.log(err);

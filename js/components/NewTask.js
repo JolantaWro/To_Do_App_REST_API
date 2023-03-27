@@ -13,6 +13,7 @@ const NewTask = ({onNewTask}) => {
             status: "open"
         }
         postTask(data, onNewTask);
+    
     }
 
     return (

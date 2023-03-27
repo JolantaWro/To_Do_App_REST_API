@@ -1,11 +1,25 @@
 import React, {useState} from "react";
-import {deleteOperation, postOperation} from "../api/operations";
+import {deleteOperation, editOperation, postOperation} from "../api/operations";
 import {deleteTask} from "../api/tasks";
 
 const Operation = ({operation, onRemoveOperation, status, setOperations}) => {
-    const [timeLocal, setTimeLocal] = useState(null);
+
+
+    const [timeLocal, setTimeLocal] = useState(0);
     const [changeTime, setChangeTime] = useState(operation.timeSpent)
     const [showFormTime, setShowFormTime] = useState(false);
+
+
+    function formatTime(total) {
+        const hours = Math.floor(total / 60);
+        const minutes = total % 60;
+        if(hours > 0) {
+            return `${hours}h ${minutes}m`;
+        } else {
+            return `${minutes}m`;
+        }
+    }
+
 
     const handleSetTimeLocal = (e) => {
         e.preventDefault();
@@ -23,11 +37,13 @@ const Operation = ({operation, onRemoveOperation, status, setOperations}) => {
     }
     const saveTime = (e) => {
         e.preventDefault();
-        setChangeTime(prevState => prevState + timeLocal);
-        const data = {description: operation.description, timeSpent: changeTime}
+        const sumTime = timeLocal + changeTime
+        setChangeTime(sumTime);
+        const data = {description: operation.description, timeSpent: sumTime}
 
-        editOperation(operation.id, data, setOperations);
+        editOperation(operation.id, data);
         setTimeLocal(0);
+        setShowFormTime(false)
     }
 
     const deleteOperationAPI = (e) => {
@@ -43,8 +59,8 @@ const Operation = ({operation, onRemoveOperation, status, setOperations}) => {
             <div>
                 {operation.description}
 
-                {operation.timeSpent > 0 ?
-                <span className="badge badge-success badge-pill ml-2">{operation.timeSpent}</span>
+                {changeTime > 0 ?
+                <span className="badge badge-success badge-pill ml-2">{formatTime(changeTime)}</span>
                     : null
                 }
             </div>
@@ -55,12 +71,12 @@ const Operation = ({operation, onRemoveOperation, status, setOperations}) => {
                         <input type="number"
                                className="form-control"
                                placeholder="Spent time in minutes"
-                               style="width: 12rem"
+                               style={{width: '12rem'}}
                                onChange={handleSetTimeLocal}/>
                         <div className="input-group-append">
-                            <button className="btn btn-outline-success" type="submit" onClick={saveTime}><i className="fas fa-save"></i>
+                            <button className="btn btn-outline-success" onClick={saveTime}><i className="fas fa-save"></i>
                             </button>
-                            <button className="btn btn-outline-dark" type="submit" onClick={cancelFormNoSet}><i
+                            <button className="btn btn-outline-dark" onClick={cancelFormNoSet}><i
                                 className="fas fa-times false"></i></button>
                         </div>
                     </div>
@@ -76,7 +92,6 @@ const Operation = ({operation, onRemoveOperation, status, setOperations}) => {
                         }
                         <button className="btn btn-outline-danger btn-sm" onClick={deleteOperationAPI}><i className="fas fa-trash"></i></button>
                     </div>
-
             }
 
         </li>
